@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Dtos;
 using WebApplication1.Models;
-using YourApi.Models;
 
 namespace WebApplication1.Controllers
 {
@@ -26,21 +25,14 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
-            return await _context.Users.Select(user => new UserDTO
-            {
-              Id = user.Id,
-              UserName = user.UserName,
-              FirstName = user.FirstName,
-              LastName = user.LastName,
-              Birth = user.Birth,
-              Email = user.Email,
-              Role = user.Role
-            }).ToListAsync();
+            return await _context.Users
+                .Select(user => UserToDTO(user))
+                .ToListAsync();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(Guid id)
+        public async Task<ActionResult<UserDTO>> GetUser(Guid id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -49,7 +41,7 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
-            return user;
+            return UserToDTO(user);
         }
 
         // PUT: api/Users/5
@@ -114,5 +106,17 @@ namespace WebApplication1.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
+
+        private static UserDTO UserToDTO(User user) =>
+            new UserDTO
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Birth = user.Birth,
+                Email = user.Email,
+                Role = user.Role,
+            };
     }
 }
