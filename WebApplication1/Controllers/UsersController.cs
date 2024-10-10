@@ -86,6 +86,23 @@ namespace WebApplication1.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
+        //POST api/Login
+        [HttpPost]
+        public async Task<ActionResult<LoginDTO>> LoginUser(Login userLogin)
+        {
+            var user = await _context.Users.FindAsync(userLogin.Email);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return new LoginDTO
+            {
+                Email = user.Email,
+                Access = true,
+                Role = user.Role
+            };
+        }
+
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
