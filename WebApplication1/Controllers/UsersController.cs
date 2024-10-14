@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
 using WebApplication1.Dtos;
 using WebApplication1.Models;
 
@@ -14,9 +16,9 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserContext _context;
+        private readonly DataContext _context;
 
-        public UsersController(UserContext context)
+        public UsersController(DataContext context)
         {
             _context = context;
         }
@@ -86,21 +88,30 @@ namespace WebApplication1.Controllers
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
-        //POST api/Login
-        [HttpPost]
-        public async Task<ActionResult<LoginDTO>> LoginUser(Login userLogin)
+        //POST: api/login
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginDTO>> PostLogin(Login user)
         {
-            var user = await _context.Users.FindAsync(userLogin.Email);
             if (user == null)
             {
-                return NotFound();
+                return BadRequest("Invalid login data.");
             }
-            return new LoginDTO
+            var existingUser = await _context.Users
+                  .FirstOrDefaultAsync(u => u.Email == user.Email);
+
+            if (existingUser == null || existingUser.Email != user.Email || existingUser.Password != user.Password)
+                {
+                    return Unauthorized("Invalid email or password.");
+                }
+
+            var loginDto = new LoginDTO
             {
                 Email = user.Email,
                 Access = true,
-                Role = user.Role
+                Role = existingUser.Role
             };
+
+            return Ok(loginDto);
         }
 
         // DELETE: api/Users/5

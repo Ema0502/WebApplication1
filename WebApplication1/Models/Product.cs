@@ -9,5 +9,8 @@
         public required string Image { get; set; }
         public required int Price { get; set; }
         public required string ConditionProd { get; set; }
+
+        public Guid UserId { get; set; }
+        public User User { get; set; } = null!;
     }
 }

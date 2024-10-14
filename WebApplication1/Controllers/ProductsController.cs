@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -13,9 +14,9 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly UserContext _context;
+        private readonly DataContext _context;
 
-        public ProductsController(UserContext context)
+        public ProductsController(DataContext context)
         {
             _context = context;
         }

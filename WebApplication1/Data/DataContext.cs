@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace WebApplication1.Models
+using WebApplication1.Models;
+
+namespace WebApplication1.Data
 {
-    public class UserContext : DbContext
+    public class DataContext : DbContext
     {
-        public UserContext(DbContextOptions<UserContext> options)
-        : base(options)
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
 
@@ -13,6 +14,19 @@ namespace WebApplication1.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>()
+                .ToTable("Users")
+                .HasKey(user => user.Id);
+
+            modelBuilder.Entity<Product>()
+                .ToTable("Products")
+                .HasKey(product => product.Id);
+
+            modelBuilder.Entity<Product>()
+              .HasOne(product => product.User)
+              .WithMany(user => user.Products)
+              .HasForeignKey(product => product.UserId);
+
             modelBuilder.Entity<User>().HasData(
                 new User
                 {

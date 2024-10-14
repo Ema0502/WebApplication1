@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebApplication1.Models;
+using WebApplication1.Data;
 
 #nullable disable
 
 namespace WebApplication1.Migrations
 {
-    [DbContext(typeof(UserContext))]
-    partial class UserContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(DataContext))]
+    partial class DataContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -50,9 +50,14 @@ namespace WebApplication1.Migrations
                     b.Property<DateTime>("PublicationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.User", b =>
@@ -90,7 +95,7 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasData(
                         new
@@ -104,6 +109,22 @@ namespace WebApplication1.Migrations
                             Role = "admin",
                             UserName = "messias"
                         });
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.Product", b =>
+                {
+                    b.HasOne("WebApplication1.Models.User", "User")
+                        .WithMany("Products")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.User", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
