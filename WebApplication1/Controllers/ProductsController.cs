@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Models;
+using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApplication1.Controllers
 {
@@ -15,17 +17,49 @@ namespace WebApplication1.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly HttpClient _httpClient;
+        JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
 
-        public ProductsController(DataContext context)
+        public ProductsController(DataContext context, HttpClient httpClient)
         {
             _context = context;
+            _httpClient = httpClient;
         }
 
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            var products = await _context.Products.ToListAsync();
+            if (products.Count != 0)
+            {
+                return Ok(products);
+            }
+            else
+            {
+                var response = await _httpClient.GetAsync("https://fakestoreapi.com/products/");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var productsApi = JsonSerializer.Deserialize<List<ProductApi>>(content, options);
+
+                    products = productsApi!.Select(product => new Product
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = product.Title,
+                        Feature = product.Description,
+                        PublicationDate = DateTime.UtcNow,
+                        Image = product.Image,
+                        Price = product.Price,
+                        ConditionProd = "new",
+                        UserId = new Guid("3fa85f64-5717-4562-b3fc-2c963f55afa6")
+                    }).ToList();
+
+                    await _context.Products.AddRangeAsync(products);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            return Ok(products);
         }
 
         // GET: api/Products/5
@@ -40,6 +74,24 @@ namespace WebApplication1.Controllers
             }
 
             return product;
+        }
+
+        // GET: api/Products?name=...
+        [HttpGet]
+        public async Task<ActionResult<Product>> GetProductsByName([FromQuery] string name)
+        {
+            var lowerCaseName = name.ToLower().Trim();
+
+            var products = await _context.Products
+                    .FirstOrDefaultAsync(p => p.Name == lowerCaseName);
+            if (products == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(products);
+            }
         }
 
         // PUT: api/Products/5
