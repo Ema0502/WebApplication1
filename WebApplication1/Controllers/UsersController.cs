@@ -106,6 +106,7 @@ namespace WebApplication1.Controllers
 
             var loginDto = new LoginDTO
             {
+                Id = existingUser.Id,
                 Email = user.Email,
                 Access = true,
                 Role = existingUser.Role

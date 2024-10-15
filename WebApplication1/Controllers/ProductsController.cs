@@ -76,8 +76,8 @@ namespace WebApplication1.Controllers
             return product;
         }
 
-        // GET: api/Products?name=...
-        [HttpGet]
+        // GET: api/Products/search?name=...
+        [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Product>>> GetProductsByName([FromQuery] string name)
         {
             var lowerCaseName = name.ToLower().Trim();
