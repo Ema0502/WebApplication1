@@ -48,9 +48,9 @@ namespace WebApplication1.Controllers
                         Id = Guid.NewGuid(),
                         Name = product.Title,
                         Feature = product.Description,
-                        PublicationDate = DateTime.UtcNow,
+                        PublicationDate = DateTime.Now,
                         Image = product.Image,
-                        Price = product.Price,
+                        Price = (int)product.Price,
                         ConditionProd = "new",
                         UserId = new Guid("3fa85f64-5717-4562-b3fc-2c963f55afa6")
                     }).ToList();
@@ -78,13 +78,14 @@ namespace WebApplication1.Controllers
 
         // GET: api/Products?name=...
         [HttpGet]
-        public async Task<ActionResult<Product>> GetProductsByName([FromQuery] string name)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByName([FromQuery] string name)
         {
             var lowerCaseName = name.ToLower().Trim();
 
             var products = await _context.Products
-                    .FirstOrDefaultAsync(p => p.Name == lowerCaseName);
-            if (products == null)
+                                      .Where(p => p.Name.ToLower().Contains(lowerCaseName))
+                                      .ToListAsync();
+            if (products == null || products.Count == 0)
             {
                 return NotFound();
             }
