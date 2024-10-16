@@ -139,7 +139,6 @@ namespace WebApplication1.Controllers
         private static UserDTO UserToDTO(User user) =>
             new UserDTO
             {
-                Id = user.Id,
                 UserName = user.UserName,
                 FirstName = user.FirstName,
                 LastName = user.LastName,

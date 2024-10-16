@@ -25,7 +25,8 @@ namespace WebApplication1.Data
             modelBuilder.Entity<Product>()
               .HasOne(product => product.User)
               .WithMany(user => user.Products)
-              .HasForeignKey(product => product.UserId);
+              .HasForeignKey(product => product.UserId)
+              .IsRequired();
 
             modelBuilder.Entity<User>().HasData(
                 new User

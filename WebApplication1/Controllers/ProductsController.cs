@@ -9,6 +9,7 @@ using WebApplication1.Data;
 using WebApplication1.Models;
 using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using WebApplication1.Dtos;
 
 namespace WebApplication1.Controllers
 {
@@ -28,7 +29,7 @@ namespace WebApplication1.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
             var products = await _context.Products.ToListAsync();
             if (products.Count != 0)
@@ -64,7 +65,7 @@ namespace WebApplication1.Controllers
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(Guid id)
+        public async Task<ActionResult<ProductDTO>> GetProduct(Guid id)
         {
             var product = await _context.Products.FindAsync(id);
 
@@ -73,7 +74,7 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
-            return product;
+            return ProductToDTO(product);
         }
 
         // GET: api/Products/search?name=...
@@ -157,5 +158,16 @@ namespace WebApplication1.Controllers
         {
             return _context.Products.Any(e => e.Id == id);
         }
+
+        private static ProductDTO ProductToDTO(Product product) =>
+            new ProductDTO
+            {
+                Name = product.Name,
+                Feature = product.Feature,
+                PublicationDate = product.PublicationDate,
+                Image = product.Image,
+                Price = product.Price,
+                ConditionProd = product.ConditionProd,
+            };
     }
 }
