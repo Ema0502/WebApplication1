@@ -10,6 +10,7 @@ using WebApplication1.Models;
 using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebApplication1.Dtos;
+using Microsoft.CodeAnalysis;
 
 namespace WebApplication1.Controllers
 {
@@ -130,12 +131,30 @@ namespace WebApplication1.Controllers
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
         {
+            var user = await _context.Users.FindAsync(productDTO.UserId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var product = new Product
+            {
+                Name = productDTO.Name,
+                Feature = productDTO.Feature,
+                PublicationDate = productDTO.PublicationDate,
+                Image = productDTO.Image,
+                Price = productDTO.Price,
+                ConditionProd = productDTO.ConditionProd,
+                UserId = productDTO.UserId,
+                User = user
+            };
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
 
         // DELETE: api/Products/5
@@ -168,6 +187,7 @@ namespace WebApplication1.Controllers
                 Image = product.Image,
                 Price = product.Price,
                 ConditionProd = product.ConditionProd,
+                UserId = product.UserId,
             };
     }
 }
