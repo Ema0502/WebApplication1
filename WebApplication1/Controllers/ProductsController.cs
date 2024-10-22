@@ -11,6 +11,7 @@ using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using WebApplication1.Dtos;
 using Microsoft.CodeAnalysis;
+using WebApplication1.Data.Repositories.Implementations;
 
 namespace WebApplication1.Controllers
 {
@@ -20,12 +21,15 @@ namespace WebApplication1.Controllers
     {
         private readonly DataContext _context;
         private readonly HttpClient _httpClient;
+        private readonly ProductRepository _repository;
+
         JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
 
-        public ProductsController(DataContext context, HttpClient httpClient)
+        public ProductsController(DataContext context, HttpClient httpClient, ProductRepository productRepository)
         {
             _context = context;
             _httpClient = httpClient;
+            _repository = productRepository;
         }
 
         // GET: api/Products
