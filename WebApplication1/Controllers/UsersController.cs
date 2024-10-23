@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Data.Repositories.Interfaces;
 using WebApplication1.Dtos;
 using WebApplication1.Models;
+using WebApplication1.Servicies;
 
 namespace WebApplication1.Controllers
 {
@@ -13,25 +13,25 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUsersService _usersService;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersController(IUsersService usersService)
         {
-            _userRepository = userRepository;
+            _usersService = usersService;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
-            return await _userRepository.GetUsers();
+            return await _usersService.GetUsers();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser(Guid id)
         {
-            return await _userRepository.GetUser(id);
+            return await _usersService.GetUser(id);
         }
 
         // PUT: api/Users/5
@@ -39,7 +39,7 @@ namespace WebApplication1.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(Guid id, User user)
         {
-            return await _userRepository.PutUser(id, user);
+            return await _usersService.PutUser(id, user);
         }
 
         // POST: api/Users
@@ -47,21 +47,21 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            return await _userRepository.PostUser(user);
+            return await _usersService.PostUser(user);
         }
 
         //POST: api/login
         [HttpPost("login")]
         public async Task<ActionResult<LoginDTO>> PostLogin(Login user)
         {
-            return await _userRepository.PostLogin(user);
+            return await _usersService.PostLogin(user);
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
-            return await _userRepository.DeleteUser(id);
+            return await _usersService.DeleteUser(id);
         }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Data.Repositories.Implementations;
 using WebApplication1.Data.Repositories.Interfaces;
+using WebApplication1.Servicies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,10 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IProductsService, ProductsService>();
+
+//builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
