@@ -55,27 +55,99 @@ namespace WebApplication1.Data.Repositories.Implementations
 
         public async Task<ActionResult<ProductDTO>> GetProduct(Guid id)
         {
-            throw new NotImplementedException();
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return ProductToDTO(product);
         }
 
         public async Task<ActionResult<IEnumerable<Product>>> GetProductsByName(string name)
         {
-            throw new NotImplementedException();
+            var lowerCaseName = name.ToLower().Trim();
+
+            var products = await _context.Products
+                                      .Where(p => p.Name.ToLower().Contains(lowerCaseName))
+                                      .ToListAsync();
+            if (products == null || products.Count == 0)
+            {
+                return new NotFoundResult();
+            }
+            else
+            {
+                return new OkObjectResult(products);
+            }
         }
 
         public async Task<IActionResult> PutProduct(Guid id, Product product)
         {
-            throw new NotImplementedException();
+            if (id != product.Id)
+            {
+                return new BadRequestResult();
+            }
+
+            _context.Entry(product).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return new NotFoundResult();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return new NoContentResult();
         }
 
         public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users.FindAsync(productDTO.UserId);
+
+            if (user == null)
+            {
+                return new NotFoundResult();
+            }
+
+            var product = new Product
+            {
+                Name = productDTO.Name,
+                Feature = productDTO.Feature,
+                PublicationDate = productDTO.PublicationDate,
+                Image = productDTO.Image,
+                Price = productDTO.Price,
+                ConditionProd = productDTO.ConditionProd,
+                UserId = productDTO.UserId,
+                User = user
+            };
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            return product;
         }
 
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
-            throw new NotImplementedException();
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return new NotFoundResult();
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+
+            return new NoContentResult();
         }
 
         private bool ProductExists(Guid id)
