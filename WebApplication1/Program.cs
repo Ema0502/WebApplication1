@@ -11,8 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Configuration.AddJsonFile("appsetings.json");
-var secretKey = builder.Configuration.GetSection("Settings").GetSection("SecretKey").ToString();
+builder.Configuration.AddJsonFile("appsettings.json");
+var secretKey = builder.Configuration.GetSection("Settings").GetSection("SecretKey").Value;
+if (string.IsNullOrEmpty(secretKey))
+{
+  throw new InvalidOperationException("SecretKey is not configured in appsettings.json.");
+}
+
 var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
 builder.Services.AddAuthentication(config =>

@@ -10,7 +10,7 @@ namespace WebApplication1.Data.Repositories.Interfaces
         Task<ActionResult<UserDTO>> GetUser(Guid id);
         Task<IActionResult> PutUser(Guid id, User user);
         Task<ActionResult<User>> PostUser(User user);
-        Task<ActionResult<LoginDTO>> PostLogin(Login user);
+        Task<User> PostLogin(Login user);
         Task<IActionResult> DeleteUser(Guid id);
-    }
+  }
 }

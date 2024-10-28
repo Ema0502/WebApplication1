@@ -71,29 +71,17 @@ namespace WebApplication1.Data.Repositories.Implementations
             return user;
         }
 
-        public async Task<ActionResult<LoginDTO>> PostLogin(Login user)
+        public async Task<User> PostLogin(Login user)
         {
-            if (user == null)
-            {
-                return new NotFoundResult();
-            }
             var existingUser = await _context.Users
                   .FirstOrDefaultAsync(u => u.Email == user.Email);
 
-            if (existingUser == null || existingUser.Email != user.Email || existingUser.Password != user.Password)
+            if (existingUser == null)
             {
-                return new NotFoundResult();
+                return null;
             }
 
-            var loginDto = new LoginDTO
-            {
-                Id = existingUser.Id,
-                Email = user.Email,
-                Access = true,
-                Role = existingUser.Role
-            };
-
-            return new OkObjectResult(loginDto);
+            return existingUser;
         }
 
         
