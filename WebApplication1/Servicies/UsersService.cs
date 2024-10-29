@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication1.Data.Repositories.Implementations;
 using WebApplication1.Servicies;
+using AutoMapper;
 
 namespace WebApplication1.Servicies
 {
@@ -15,30 +16,52 @@ namespace WebApplication1.Servicies
     {
         private readonly IUserRepository _userRepository;
         private readonly string _secretKey;
-        public UsersService(IConfiguration config, IUserRepository userRepository)
+        private readonly IMapper _mapper;
+        public UsersService(IConfiguration config, IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _secretKey = config.GetSection("Settings").GetSection("SecretKey").ToString();
+            _mapper = mapper;
         }
 
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
+        public async Task<IEnumerable<UserDTO>> GetUsers()
         {
-            return await _userRepository.GetUsers();
+            var listUsers = await _userRepository.GetUsers();
+            if (listUsers == null)
+            {
+                return null;
+            }
+            return _mapper.Map<IEnumerable<UserDTO>>(listUsers);
         }
 
         public async Task<ActionResult<UserDTO>> GetUser(Guid id)
         {
-            return await _userRepository.GetUser(id);
+            var user = await _userRepository.GetUser(id);
+            if (user == null)
+            {
+                return null;
+            }
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<IActionResult> PutUser(Guid id, User user)
+        public async Task<ActionResult<UserDTO>> PutUser(Guid id, User user)
         {
-            return await _userRepository.PutUser(id, user);
+            var editUser = await _userRepository.PutUser(id, user);
+            if (editUser == null)
+            {
+                return new NoContentResult();
+            }
+            return _mapper.Map<UserDTO>(editUser);
         }
 
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDTO>> PostUser(User user)
         {
-            return await _userRepository.PostUser(user);
+            var createUser = await _userRepository.PostUser(user);
+            if (user == null)
+            {
+                return null;
+            }
+            return _mapper.Map<UserDTO>(createUser);
         }
 
         public async Task<ActionResult<LoginDTO>> PostLogin(Login user)
@@ -50,20 +73,17 @@ namespace WebApplication1.Servicies
                 return new UnauthorizedResult();
             }
 
-            var token = GenerateJwtToken(userExister.Email, userExister.Role);
+            var loginDto = _mapper.Map<LoginDTO>(userExister);
+            loginDto.Token = GenerateJwtToken(loginDto.Email, loginDto.Role);
+            loginDto.Access = true;
 
-            return new LoginDTO
-            {
-                Email = userExister.Email,
-                Role = userExister.Role,
-                Access = true,
-                Token = token
-            };
+            return loginDto;
         }
 
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<ActionResult<UserDTO>> DeleteUser(Guid id)
         {
-            return await _userRepository.DeleteUser(id);
+            var deleteUser = await _userRepository.DeleteUser(id);
+            return _mapper.Map<UserDTO>(deleteUser);
         }
 
         private string GenerateJwtToken(string email, string role)

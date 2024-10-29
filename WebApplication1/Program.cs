@@ -6,6 +6,7 @@ using WebApplication1.Servicies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebApplication1.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +66,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IProductsService, ProductsService>();
 
-//builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(UserProfile));
 
 var app = builder.Build();
 

@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Dtos;
 using WebApplication1.Models;
@@ -16,14 +15,14 @@ namespace WebApplication1.Data.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users
-                .Select(user => UserToDTO(user))
+                .Select(user => user)
                 .ToListAsync();
         }
 
-        public async Task<ActionResult<UserDTO>> GetUser(Guid id)
+        public async Task<ActionResult<User>> GetUser(Guid id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -32,10 +31,10 @@ namespace WebApplication1.Data.Repositories.Implementations
                 return new NotFoundResult();
             }
 
-            return UserToDTO(user);
+            return user;
         }
 
-        public async Task<IActionResult> PutUser(Guid id, User user)
+        public async Task<ActionResult<User>> PutUser(Guid id, User user)
         {
             if (id != user.Id)
             {
@@ -47,6 +46,7 @@ namespace WebApplication1.Data.Repositories.Implementations
             try
             {
                 await _context.SaveChangesAsync();
+                return await this.GetUser(id);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -59,8 +59,6 @@ namespace WebApplication1.Data.Repositories.Implementations
                     throw;
                 }
             }
-
-            return new NoContentResult();
         }
 
         public async Task<ActionResult<User>> PostUser(User user)
@@ -71,21 +69,21 @@ namespace WebApplication1.Data.Repositories.Implementations
             return user;
         }
 
-        public async Task<User> PostLogin(Login user)
+        public async Task<ActionResult<User>> PostLogin(Login user)
         {
             var existingUser = await _context.Users
-                  .FirstOrDefaultAsync(u => u.Email == user.Email);
+                  .FirstOrDefaultAsync(u => u.Email == user.Email && u.Password == user.Password);
 
             if (existingUser == null)
             {
-                return null;
+                return new NoContentResult();
             }
 
             return existingUser;
         }
 
         
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<ActionResult<User>> DeleteUser(Guid id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -96,7 +94,7 @@ namespace WebApplication1.Data.Repositories.Implementations
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
-            return new NoContentResult();
+            return user;
         }
 
         private bool UserExists(Guid id)

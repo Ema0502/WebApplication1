@@ -6,11 +6,11 @@ namespace WebApplication1.Servicies
 {
     public interface IUsersService
     {
-        Task<ActionResult<IEnumerable<UserDTO>>> GetUsers();
+        Task<IEnumerable<UserDTO>> GetUsers();
         Task<ActionResult<UserDTO>> GetUser(Guid id);
-        Task<IActionResult> PutUser(Guid id, User user);
-        Task<ActionResult<User>> PostUser(User user);
+        Task<ActionResult<UserDTO>> PutUser(Guid id, User user);
+        Task<ActionResult<UserDTO>> PostUser(User user);
         Task<ActionResult<LoginDTO>> PostLogin(Login user);
-        Task<IActionResult> DeleteUser(Guid id);
+        Task<ActionResult<UserDTO>> DeleteUser(Guid id);
     }
 }

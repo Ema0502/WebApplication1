@@ -6,11 +6,11 @@ namespace WebApplication1.Data.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<ActionResult<IEnumerable<UserDTO>>> GetUsers();
-        Task<ActionResult<UserDTO>> GetUser(Guid id);
-        Task<IActionResult> PutUser(Guid id, User user);
+        Task<ActionResult<IEnumerable<User>>> GetUsers();
+        Task<ActionResult<User>> GetUser(Guid id);
+        Task<ActionResult<User>> PutUser(Guid id, User user);
         Task<ActionResult<User>> PostUser(User user);
-        Task<User> PostLogin(Login user);
-        Task<IActionResult> DeleteUser(Guid id);
+        Task<ActionResult<User>> PostLogin(Login user);
+        Task<ActionResult<User>> DeleteUser(Guid id);
   }
 }

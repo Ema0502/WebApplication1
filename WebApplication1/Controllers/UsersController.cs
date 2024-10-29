@@ -26,7 +26,12 @@ namespace WebApplication1.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
-            return await _usersService.GetUsers();
+            var listUsers = await _usersService.GetUsers();
+            if (listUsers == null)
+            {
+                return BadRequest();
+            }
+            return Ok(listUsers);
         }
 
         // GET: api/Users/5
@@ -41,7 +46,7 @@ namespace WebApplication1.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> PutUser(Guid id, User user)
+        public async Task<ActionResult<UserDTO>> PutUser(Guid id, User user)
         {
             return await _usersService.PutUser(id, user);
         }
@@ -50,7 +55,7 @@ namespace WebApplication1.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDTO>> PostUser(User user)
         {
             return await _usersService.PostUser(user);
         }
@@ -64,7 +69,7 @@ namespace WebApplication1.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<ActionResult<UserDTO>> DeleteUser(Guid id)
         {
             return await _usersService.DeleteUser(id);
         }
