@@ -24,44 +24,143 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
-            return await _productsService.GetProducts();
+            try
+            {
+
+                var products = await _productsService.GetProducts();
+                if (products == null)
+                {
+                    return NotFound();
+                }
+                return Ok(products);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { Message = "Error in the server" });
+            }
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> GetProduct(Guid id)
         {
-            return await _productsService.GetProduct(id);
+            try
+            {
+                var user = await _productsService.GetProduct(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { Message = "Error in the server" });
+            }
         }
 
         // GET: api/Products/search?name=...
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByName([FromQuery] string name)
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProductsByName([FromQuery] string name)
         {
-            return await _productsService.GetProductsByName(name);
+            try
+            {
+
+                var products = await _productsService.GetProductsByName(name);
+                if (products == null)
+                {
+                    return NotFound();
+                }
+                return Ok(products);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { Message = "Error in the server" });
+            }
         }
 
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(Guid id, Product product)
+        public async Task<ActionResult<ProductDTO>> PutProduct(Guid id, Product product)
         {
-            return await _productsService.PutProduct(id, product);
+            try
+            {
+
+                var updateProduct = await _productsService.PutProduct(id, product);
+                if (updateProduct == null)
+                {
+                    return NotFound();
+                }
+                return Ok(updateProduct);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { Message = "Error in the server" });
+            }
         }
 
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
+        public async Task<ActionResult<ProductDTO>> PostProduct(Product product)
         {
-            return await _productsService.PostProduct(productDTO);
+            try
+            {
+                var productCreate = await _productsService.PostProduct(product);
+                if (productCreate == null)
+                {
+                    return NotFound();
+                }
+                return Ok(product);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { Message = "Error in the server" });
+            }
         }
 
         // DELETE: api/Products/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        public async Task<ActionResult<ProductDTO>> DeleteProduct(Guid id)
         {
-            return await _productsService.DeleteProduct(id);
+            try
+            {
+                var product = await _productsService.DeleteProduct(id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                return Ok(product);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { Message = "Error in the server" });
+            }
         }
     }
 }

@@ -67,6 +67,7 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IProductsService, ProductsService>();
 
 builder.Services.AddAutoMapper(typeof(UserProfile));
+builder.Services.AddAutoMapper(typeof(ProductProfile));
 
 var app = builder.Build();
 

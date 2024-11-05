@@ -26,12 +26,23 @@ namespace WebApplication1.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
-            var listUsers = await _usersService.GetUsers();
-            if (listUsers == null)
+            try
             {
-                return BadRequest();
+                var listUsers = await _usersService.GetUsers();
+                if (listUsers == null)
+                {
+                    return BadRequest();
+                }
+                return Ok(listUsers);
             }
-            return Ok(listUsers);
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { Message = "Error in the server" });
+            }
         }
 
         // GET: api/Users/5

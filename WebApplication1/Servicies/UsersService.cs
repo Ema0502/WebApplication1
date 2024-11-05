@@ -6,8 +6,6 @@ using WebApplication1.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using WebApplication1.Data.Repositories.Implementations;
-using WebApplication1.Servicies;
 using AutoMapper;
 
 namespace WebApplication1.Servicies
