@@ -26,7 +26,6 @@ namespace WebApplication1.Controllers
         {
             try
             {
-
                 var products = await _productsService.GetProducts();
                 if (products == null)
                 {
@@ -38,9 +37,9 @@ namespace WebApplication1.Controllers
             {
                 return BadRequest(new { ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Error in the server" });
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -50,20 +49,20 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var user = await _productsService.GetProduct(id);
-                if (user == null)
+                var product = await _productsService.GetProduct(id);
+                if (product == null)
                 {
                     return NotFound();
                 }
-                return Ok(user);
+                return Ok(product);
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Error in the server" });
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -73,7 +72,6 @@ namespace WebApplication1.Controllers
         {
             try
             {
-
                 var products = await _productsService.GetProductsByName(name);
                 if (products == null)
                 {
@@ -85,9 +83,9 @@ namespace WebApplication1.Controllers
             {
                 return BadRequest(new { ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Error in the server" });
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -98,7 +96,6 @@ namespace WebApplication1.Controllers
         {
             try
             {
-
                 var updateProduct = await _productsService.PutProduct(id, product);
                 if (updateProduct == null)
                 {
@@ -110,9 +107,9 @@ namespace WebApplication1.Controllers
             {
                 return BadRequest(new { ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Error in the server" });
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -134,9 +131,9 @@ namespace WebApplication1.Controllers
             {
                 return BadRequest(new { ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Error in the server" });
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -157,9 +154,9 @@ namespace WebApplication1.Controllers
             {
                 return BadRequest(new { ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Error in the server" });
+                return StatusCode(500, new { ex.Message });
             }
         }
     }

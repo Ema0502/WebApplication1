@@ -39,9 +39,9 @@ namespace WebApplication1.Controllers
             {
                 return BadRequest(new { ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Error in the server" });
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -50,7 +50,23 @@ namespace WebApplication1.Controllers
         [Authorize]
         public async Task<ActionResult<UserDTO>> GetUser(Guid id)
         {
-            return await _usersService.GetUser(id);
+            try
+            {
+                var user = await _usersService.GetUser(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
         }
 
         // PUT: api/Users/5
@@ -59,7 +75,23 @@ namespace WebApplication1.Controllers
         [Authorize]
         public async Task<ActionResult<UserDTO>> PutUser(Guid id, User user)
         {
-            return await _usersService.PutUser(id, user);
+            try
+            {
+                var updateUser = await _usersService.PutUser(id, user);
+                if (updateUser == null)
+                {
+                    return NotFound();
+                }
+                return Ok(updateUser);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
         }
 
         // POST: api/Users
@@ -68,21 +100,64 @@ namespace WebApplication1.Controllers
         [Authorize]
         public async Task<ActionResult<UserDTO>> PostUser(User user)
         {
-            return await _usersService.PostUser(user);
+            try
+            {
+                return await _usersService.PostUser(user);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
         }
 
         //POST: api/login
         [HttpPost("login")]
         public async Task<ActionResult<LoginDTO>> PostLogin(Login user)
         {
-            return await _usersService.PostLogin(user);
+            try
+            {
+                var userlogged = await _usersService.PostLogin(user);
+                if (userlogged == null)
+                {
+                    return NotFound();
+                }
+                return Ok(userlogged);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<UserDTO>> DeleteUser(Guid id)
         {
-            return await _usersService.DeleteUser(id);
+            try
+            {
+                var user = await _usersService.DeleteUser(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
         }
     }
 }

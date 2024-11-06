@@ -24,72 +24,117 @@ namespace WebApplication1.Servicies
 
         public async Task<IEnumerable<UserDTO>> GetUsers()
         {
-            var listUsers = await _userRepository.GetUsers();
-            if (listUsers == null)
+            try
             {
-                return null;
+                var listUsers = await _userRepository.GetUsers();
+                if (listUsers == null)
+                {
+                    throw new ArgumentException("No users found in the repository");
+                }
+                return _mapper.Map<IEnumerable<UserDTO>>(listUsers);
             }
-            return _mapper.Map<IEnumerable<UserDTO>>(listUsers);
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<UserDTO>> GetUser(Guid id)
         {
-            var user = await _userRepository.GetUser(id);
-            if (user == null)
+            try
             {
-                return null;
+                var user = await _userRepository.GetUser(id);
+                if (user == null)
+                {
+                    throw new ArgumentException("No user found in the repository");
+                }
+                return _mapper.Map<UserDTO>(user);
             }
-            return _mapper.Map<UserDTO>(user);
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<UserDTO>> PutUser(Guid id, User user)
         {
-            var editUser = await _userRepository.PutUser(id, user);
-            if (editUser == null)
+            try
             {
-                return new NoContentResult();
+                var editUser = await _userRepository.PutUser(id, user);
+                if (editUser == null)
+                {
+                    throw new ArgumentException("No user found in the repository");
+                }
+                return _mapper.Map<UserDTO>(editUser);
             }
-            return _mapper.Map<UserDTO>(editUser);
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<UserDTO>> PostUser(User user)
         {
-            var createUser = await _userRepository.PostUser(user);
-            if (user == null)
+            try
             {
-                return null;
+                var createUser = await _userRepository.PostUser(user);
+                if (user == null)
+                {
+                    throw new ArgumentException("Error in the repository");
+                }
+                return _mapper.Map<UserDTO>(createUser);
             }
-            return _mapper.Map<UserDTO>(createUser);
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<LoginDTO>> PostLogin(Login user)
         {
-            var userExister = await _userRepository.PostLogin(user);
-
-            if (userExister == null)
+            try
             {
-                return new UnauthorizedResult();
+                var userExister = await _userRepository.PostLogin(user);
+
+                if (userExister == null)
+                {
+                    return new UnauthorizedResult();
+                }
+
+                var loginDto = _mapper.Map<LoginDTO>(userExister);
+                loginDto.Token = GenerateJwtToken(loginDto.Email);
+                loginDto.Access = true;
+
+                return loginDto;
             }
-
-            var loginDto = _mapper.Map<LoginDTO>(userExister);
-            loginDto.Token = GenerateJwtToken(loginDto.Email, loginDto.Role);
-            loginDto.Access = true;
-
-            return loginDto;
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<UserDTO>> DeleteUser(Guid id)
         {
-            var deleteUser = await _userRepository.DeleteUser(id);
-            return _mapper.Map<UserDTO>(deleteUser);
+            try
+            {
+                var deleteUser = await _userRepository.DeleteUser(id);
+                if (deleteUser == null)
+                {
+                    throw new ArgumentException("No user found in the repository");
+                }
+                return _mapper.Map<UserDTO>(deleteUser);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
-        private string GenerateJwtToken(string email, string role)
+        private string GenerateJwtToken(string email)
         {
             var keyBytes = System.Text.Encoding.ASCII.GetBytes(_secretKey);
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, email));
-            claims.AddClaim(new Claim(ClaimTypes.Role, role));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

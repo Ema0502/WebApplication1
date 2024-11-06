@@ -12,8 +12,8 @@ namespace WebApplication1.Profiles
             CreateMap<User, UserDTO>();
             CreateMap<UserDTO, User>();
 
-            CreateMap<Login, LoginDTO>();
-            CreateMap<LoginDTO, Login>();
+            CreateMap<User, LoginDTO>();
+            CreateMap<LoginDTO, User>();
         }
     }
 }

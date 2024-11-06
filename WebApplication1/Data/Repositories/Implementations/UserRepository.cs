@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebApplication1.Dtos;
 using WebApplication1.Models;
 using WebApplication1.Data.Repositories.Interfaces;
 
@@ -17,21 +16,43 @@ namespace WebApplication1.Data.Repositories.Implementations
 
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users
-                .Select(user => user)
-                .ToListAsync();
+            try
+            {
+                return await _context.Users
+                    .Select(user => user)
+                    .ToListAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error getting users in database", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<User>> GetUser(Guid id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
+            try
             {
-                return new NotFoundResult();
-            }
+                var user = await _context.Users.FindAsync(id);
 
-            return user;
+                if (user == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                return user;
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error getting user in database", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<User>> PutUser(Guid id, User user)
@@ -63,54 +84,76 @@ namespace WebApplication1.Data.Repositories.Implementations
 
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
 
-            return user;
+                return user;
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error creating a user in database", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<User>> PostLogin(Login user)
         {
-            var existingUser = await _context.Users
-                  .FirstOrDefaultAsync(u => u.Email == user.Email && u.Password == user.Password);
-
-            if (existingUser == null)
+            try
             {
-                return new NoContentResult();
-            }
+                var existingUser = await _context.Users
+                      .FirstOrDefaultAsync(u => u.Email == user.Email && u.Password == user.Password);
 
-            return existingUser;
+                if (existingUser == null)
+                {
+                    return new NoContentResult();
+                }
+
+                return existingUser;
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error getting data in database", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
-        
+
         public async Task<ActionResult<User>> DeleteUser(Guid id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            try
             {
-                return new NotFoundResult();
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+
+                return user;
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return user;
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error getting user in database", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         private bool UserExists(Guid id)
         {
             return _context.Users.Any(e => e.Id == id);
         }
-
-        private static UserDTO UserToDTO(User user) =>
-            new UserDTO
-            {
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Birth = user.Birth,
-                Email = user.Email,
-                Role = user.Role,
-            };
     }
 }

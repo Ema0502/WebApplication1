@@ -91,7 +91,7 @@ namespace WebApplication1.Servicies
                 var createProduct = await _productRepository.PostProduct(product);
                 if (createProduct == null)
                 {
-                    throw new ArgumentException("No product found in the repository");
+                    throw new ArgumentException("Error in the repository");
                 }
                 return _mapper.Map<ProductDTO>(createProduct);
             }

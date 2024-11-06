@@ -90,7 +90,7 @@ namespace WebApplication1.Data.Repositories.Implementations
             {
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    return null;
+                    throw new HttpRequestException("Error getting products from external api");
                 }
 
                 var lowerCaseName = name.ToLower().Trim();
@@ -149,17 +149,28 @@ namespace WebApplication1.Data.Repositories.Implementations
 
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
-            var user = await _context.Users.FindAsync(product.UserId);
-
-            if (user == null)
+            try
             {
-                return new NotFoundResult();
+                var user = await _context.Users.FindAsync(product.UserId);
+
+                if (user == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync();
+
+                return product;
             }
-
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
-            return product;
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error creating a product in database", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error", ex);
+            }
         }
 
         public async Task<ActionResult<Product>> DeleteProduct(Guid id)
