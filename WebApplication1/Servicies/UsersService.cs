@@ -35,7 +35,7 @@ namespace WebApplication1.Servicies
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error", ex);
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -52,7 +52,7 @@ namespace WebApplication1.Servicies
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error", ex);
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -69,7 +69,7 @@ namespace WebApplication1.Servicies
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error", ex);
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -86,7 +86,7 @@ namespace WebApplication1.Servicies
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error", ex);
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -96,20 +96,26 @@ namespace WebApplication1.Servicies
             {
                 var userExister = await _userRepository.PostLogin(user);
 
-                if (userExister == null)
+                if (userExister.Value == null)
                 {
                     return new UnauthorizedResult();
                 }
 
-                var loginDto = _mapper.Map<LoginDTO>(userExister);
-                loginDto.Token = GenerateJwtToken(loginDto.Email);
-                loginDto.Access = true;
+                var userDto = _mapper.Map<UserDTO>(userExister.Value);
+                var token = this.GenerateJwtToken(userDto.Email, userDto.Role);
 
+                LoginDTO loginDto = new LoginDTO
+                {
+                    Email = userDto.Email,
+                    Role = userDto.Role,
+                    Access = true,
+                    Token = token
+                };
                 return loginDto;
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error", ex);
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -126,15 +132,16 @@ namespace WebApplication1.Servicies
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error", ex);
+                throw new Exception(ex.Message, ex);
             }
         }
 
-        private string GenerateJwtToken(string email)
+        private string GenerateJwtToken(string email, string role)
         {
             var keyBytes = System.Text.Encoding.ASCII.GetBytes(_secretKey);
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, email));
+            claims.AddClaim(new Claim(ClaimTypes.Name, role));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

@@ -2,9 +2,9 @@
 {
     public class LoginDTO
     {
-        public string Token { get; set;}
-        public string Email { get; set; }
-        public bool Access { get; set; }
-        public string Role { get; set; }
+        public required string Token { get; set;}
+        public required string Email { get; set; }
+        public required bool Access { get; set; }
+        public required string Role { get; set; }
     }
 }
