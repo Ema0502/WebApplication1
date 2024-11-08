@@ -102,7 +102,7 @@ namespace WebApplication1.Servicies
                 }
 
                 var userDto = _mapper.Map<UserDTO>(userExister.Value);
-                var token = this.GenerateJwtToken(userDto.Email, userDto.Role);
+                var token = this.GenerateJwtToken(userDto.Email);
 
                 LoginDTO loginDto = new LoginDTO
                 {
@@ -136,12 +136,11 @@ namespace WebApplication1.Servicies
             }
         }
 
-        private string GenerateJwtToken(string email, string role)
+        private string GenerateJwtToken(string email)
         {
             var keyBytes = System.Text.Encoding.ASCII.GetBytes(_secretKey);
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, email));
-            claims.AddClaim(new Claim(ClaimTypes.Name, role));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
